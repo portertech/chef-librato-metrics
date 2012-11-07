@@ -21,5 +21,8 @@ action :create do
   email = new_resource.email || node.librato_metrics.email
   token = new_resource.token || node.librato_metrics.token
   librato = Librato::Metrics.new(email, token)
-  librato.create_instrument(new_resource.name, new_resource.streams)
+  unless librato.instrument_exists?(new_resource.name)
+    librato.create_instrument(new_resource.name, new_resource.streams)
+    new_resource.updated_by_last_action(true)
+  end
 end

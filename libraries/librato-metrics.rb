@@ -23,12 +23,15 @@ module Librato
       @api = "https://#{email}:#{token}@#{api}"
     end
 
-    def get_instrument(id)
-      http_request("get", "instruments/#{id}")
-    end
-
-    def instrument_exists?(id)
-      get_instrument(id).first == 200
+    def instrument_exists?(name)
+      status, body = http_request("get", "instruments")
+      if status == 200 && !body.nil?
+        body["instruments"].any? do |instrument|
+          instrument["name"] == name
+        end
+      else
+        false
+      end
     end
 
     def create_instrument(name, streams=[])
@@ -41,7 +44,7 @@ module Librato
 
     private
 
-    def http_request(http_method="get", resource="", body=nil)
+    def http_request(http_method, resource, body=nil)
       uri = URI.parse(@api + resource)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
