@@ -61,14 +61,19 @@ module Librato
       end
     end
 
-    def update_instrument(name, streams=[])
+    def update_instrument(name, streams=[], addition=false)
       current_instrument = get_instrument(name)
-      if current_instrument["streams"] == streams
+      updated_streams = if addition
+        (current_instrument["streams"] + streams).uniq
+      else
+        streams
+      end
+      if current_instrument["streams"] == updated_streams
         false
       else
         instrument = {
           "name" => name,
-          "streams" => streams
+          "streams" => updated_streams
         }
         code, body = api_request("put", "instruments/#{current_instrument["id"]}", instrument)
         if code == 204

@@ -48,9 +48,7 @@ action :update do
 end
 
 action :add do
-  instrument = @librato.get_instrument(new_resource.name)
-  streams = (instrument["streams"] + @streams).uniq
-  if @librato.update_instrument(new_resource.name, streams)
+  if @librato.update_instrument(new_resource.name, @streams, true)
     new_resource.updated_by_last_action(true)
   end
 end
