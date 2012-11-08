@@ -17,12 +17,26 @@
 # limitations under the License.
 #
 
-librato_metrics_instrument "example" do
-  streams([
-    {
-      "metric" => "foobar",
-      "source" => "*",
-      "group_function" => "average"
-    }
-  ])
-end
+# librato_metrics_instrument "example" do
+#   metric "foo"
+#   source "*"
+#   group_function "average"
+# end
+
+# librato_metrics_instrument "example" do
+#   streams([
+#     {
+#       "metric" => "foo",
+#       "source" => "*",
+#       "group_function" => "sum"
+#     }
+#   ])
+#   action :update
+# end
+
+# librato_metrics_instrument "example" do
+#   metric "bar"
+#   source "*"
+#   group_function "average"
+#   action :add
+# end

@@ -17,21 +17,40 @@
 # limitations under the License.
 #
 
-action :create do
+def load_current_resource
   email = new_resource.email || node.librato_metrics.email
   token = new_resource.token || node.librato_metrics.token
-  librato = Librato::Metrics.new(email, token)
-  unless librato.instrument_exists?(new_resource.name)
-    librato.create_instrument(new_resource.name, new_resource.streams)
+  @librato = Librato::Metrics.new(email, token)
+  @streams = if new_resource.metric
+    [
+      {
+        "metric" => new_resource.metric,
+        "source" => new_resource.source,
+        "group_function" => new_resource.group_function
+      }
+    ]
+  else
+    new_resource.streams
+  end
+end
+
+action :create do
+  unless @librato.instrument_exists?(new_resource.name)
+    @librato.create_instrument(new_resource.name, @streams)
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :update do
-  email = new_resource.email || node.librato_metrics.email
-  token = new_resource.token || node.librato_metrics.token
-  librato = Librato::Metrics.new(email, token)
-  if librato.update_instrument(new_resource.name, new_resource.streams)
+  if @librato.update_instrument(new_resource.name, @streams)
+    new_resource.updated_by_last_action(true)
+  end
+end
+
+action :add do
+  instrument = @librato.get_instrument(new_resource.name)
+  streams = instrument["streams"].merge(@streams).uniq
+  if @librato.update_instrument(new_resource.name, streams)
     new_resource.updated_by_last_action(true)
   end
 end
