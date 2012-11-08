@@ -20,11 +20,11 @@
 module Librato
   class Metrics
     def initialize(email, token, api="metrics-api.librato.com/v1/")
-      @api = "https://#{email}:#{token}@#{api}"
+      @api_url = "https://#{email}:#{token}@#{api}"
     end
 
     def instrument_exists?(name)
-      status, body = http_request("get", "instruments")
+      status, body = api_request("get", "instruments")
       if status == 200 && !body.nil?
         body["instruments"].any? do |instrument|
           instrument["name"] == name
@@ -39,13 +39,13 @@ module Librato
         "name" => name,
         "streams" => streams
       }
-      http_request("post", "instruments", body).first == 201
+      api_request("post", "instruments", body).first == 201
     end
 
     private
 
-    def http_request(http_method, resource, body=nil)
-      uri = URI.parse(@api + resource)
+    def api_request(http_method, resource, body=nil)
+      uri = URI.parse(@api_url + resource)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -60,8 +60,8 @@ module Librato
       request.basic_auth(uri.user, uri.password)
       request.body = body
       response = http.request(request)
-      response_body = JSON.parse(response.body) rescue nil
       response_status = response.status.to_i
+      response_body = JSON.parse(response.body) rescue nil
       [response_status, response_body]
     end
   end
