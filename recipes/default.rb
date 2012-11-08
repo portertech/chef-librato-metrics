@@ -16,3 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+librato_metrics_instrument "example" do
+  streams([
+    {
+      "metric" => "foobar",
+      "source" => "*",
+      "group_function" => "average"
+    }
+  ])
+end

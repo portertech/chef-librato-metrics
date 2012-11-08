@@ -20,26 +20,63 @@
 module Librato
   class Metrics
     def initialize(email, token, api="metrics-api.librato.com/v1/")
-      @api_url = "https://#{email}:#{token}@#{api}"
+      @email = email
+      @token = token
+      @api_url = "https://" + api
     end
 
-    def instrument_exists?(name)
-      status, body = api_request("get", "instruments")
-      if status == 200 && !body.nil?
-        body["instruments"].any? do |instrument|
-          instrument["name"] == name
-        end
+    def instruments
+      code, body = api_request("get", "instruments")
+      if code == 200
+        body["instruments"]
       else
-        false
+        raise "Failed to get Librato Metrics instruments"
       end
     end
 
+    def instrument_exists?(name)
+      instruments.any? do |instrument|
+        instrument["name"] == name
+      end
+    end
+
+    def get_instrument(name)
+      instrument = instruments.select {|instrument| instrument["name"] == name }.first
+      if instrument.nil?
+        raise "Librato Metrics instrument '#{name}' does not exist"
+      end
+      instrument
+    end
+
     def create_instrument(name, streams=[])
-      body = {
+      instrument = {
         "name" => name,
         "streams" => streams
       }
-      api_request("post", "instruments", body).first == 201
+      code, body = api_request("post", "instruments", instrument)
+      if code == 201
+        true
+      else
+        raise "Failed to create Librato Metrics instrument '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
+    def update_instrument(name, streams=[])
+      current_instrument = get_instrument(name)
+      if current_instrument["streams"] == streams
+        false
+      else
+        instrument = {
+          "name" => name,
+          "streams" => streams
+        }
+        code, body = api_request("put", "instruments/#{current_instrument["id"]}", instrument)
+        if code == 204
+          true
+        else
+          raise "Failed to update Librato Metrics instrument '#{name}' -- #{code} -- #{body}"
+        end
+      end
     end
 
     private
@@ -55,14 +92,16 @@ module Librato
         Net::HTTP::Get.new(request_uri)
       when "post"
         Net::HTTP::Post.new(request_uri)
+      when "put"
+        Net::HTTP::Put.new(request_uri)
       end
       request.add_field("Content-Type", "application/json")
-      request.basic_auth(uri.user, uri.password)
-      request.body = body
+      request.basic_auth(@email, @token)
+      request.body = body.to_json unless body.nil?
       response = http.request(request)
-      response_status = response.status.to_i
+      response_code = response.code.to_i
       response_body = JSON.parse(response.body) rescue nil
-      [response_status, response_body]
+      [response_code, response_body]
     end
   end
 end

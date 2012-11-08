@@ -26,3 +26,12 @@ action :create do
     new_resource.updated_by_last_action(true)
   end
 end
+
+action :update do
+  email = new_resource.email || node.librato_metrics.email
+  token = new_resource.token || node.librato_metrics.token
+  librato = Librato::Metrics.new(email, token)
+  if librato.update_instrument(new_resource.name, new_resource.streams)
+    new_resource.updated_by_last_action(true)
+  end
+end
