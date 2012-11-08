@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: librato-metrics
+# Cookbook Name:: librato_metrics
 # Resource:: instrument
 #
 # Copyright 2012, Sean Porter Consulting

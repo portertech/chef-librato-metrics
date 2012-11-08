@@ -1,6 +1,6 @@
 #
-# Cookbook Name:: librato-metrics
-# Library:: librato-metrics
+# Cookbook Name:: librato_metrics
+# Library:: librato_metrics
 #
 # Copyright 2012, Sean Porter Consulting
 #
