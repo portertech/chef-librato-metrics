@@ -19,10 +19,10 @@
 
 module Librato
   class Metrics
-    def initialize(email, token, api="metrics-api.librato.com/v1/")
+    def initialize(email, token, api_url="https://metrics-api.librato.com/v1/")
       @email = email
       @token = token
-      @api_url = "https://" + api
+      @api_url = api_url
     end
 
     def instruments
@@ -30,7 +30,7 @@ module Librato
       if code == 200
         body["instruments"]
       else
-        raise "Failed to get Librato Metrics instruments"
+        raise "Failed to get Librato Metrics instruments -- #{code} -- #{body}"
       end
     end
 
@@ -89,8 +89,10 @@ module Librato
     def api_request(http_method, resource, body=nil)
       uri = URI.parse(@api_url + resource)
       http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      if uri.scheme == "https"
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
       request_uri = uri.request_uri
       request = case http_method
       when "get"
