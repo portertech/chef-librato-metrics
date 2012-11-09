@@ -88,8 +88,6 @@ end
 
 ## Todo
 
-- API request timeout
-- Soft failure (just log it)
 - Instrument listing pagination
 - Delete an instrument
 
