@@ -2,11 +2,11 @@
 
 ## Description
 
-Provides a LWRP to manage (Librato Metrics)[https://metrics.librato.com] instruments.
+Provides a LWRP to manage [Librato Metrics](https://metrics.librato.com) instruments.
 
 ## Requirements
 
-(Librato Metrics)[https://metrics.librato.com] account credentials.
+[Librato Metrics](https://metrics.librato.com) account credentials.
 
 ## Attributes
 
