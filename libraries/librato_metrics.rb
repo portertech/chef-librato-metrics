@@ -108,12 +108,12 @@ module Librato
       begin
         Timeout::timeout(8) do
           response = http.request(request)
+          response_code = response.code.to_i
+          response_body = JSON.parse(response.body) rescue nil
+          [response_code, response_body]
         end
-        response_code = response.code.to_i
-        response_body = JSON.parse(response.body) rescue nil
-        [response_code, response_body]
       rescue Timeout::Error
-        raise "Librato Metrics API request timed out (8 seconds)"
+        raise "Librato Metrics API request timed out (8 seconds) -- #{request_uri}"
       end
     end
   end
