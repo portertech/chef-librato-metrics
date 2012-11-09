@@ -1,5 +1,3 @@
-# Librato Metrics
-
 ## Description
 
 Provides a LWRP to manage [Librato Metrics](https://metrics.librato.com) instruments.
@@ -72,7 +70,7 @@ end
 It's common to create an instrument and ensure it keeps up-to-date:
 
 ``` ruby
-action [:create, update]
+action [:create, :update]
 ```
 
 ### Add
@@ -82,7 +80,7 @@ Add a metric stream to an existing instrument:
 ``` ruby
 librato_metrics_instrument "example" do
   metric "super"
-  source "*"
+  source "*.sub.domain.com"
   group_function "sum"
   action :add
 end
