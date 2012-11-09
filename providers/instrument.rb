@@ -35,20 +35,32 @@ def load_current_resource
 end
 
 action :create do
-  unless @librato.instrument_exists?(new_resource.name)
-    @librato.create_instrument(new_resource.name, @streams)
-    new_resource.updated_by_last_action(true)
+  begin
+    unless @librato.instrument_exists?(new_resource.name)
+      @librato.create_instrument(new_resource.name, @streams)
+      new_resource.updated_by_last_action(true)
+    end
+  rescue => error
+    Chef::Log.warn(error.to_s)
   end
 end
 
 action :update do
-  if @librato.update_instrument(new_resource.name, @streams)
-    new_resource.updated_by_last_action(true)
+  begin
+    if @librato.update_instrument(new_resource.name, @streams)
+      new_resource.updated_by_last_action(true)
+    end
+  rescue => error
+    Chef::Log.warn(error.to_s)
   end
 end
 
 action :add do
-  if @librato.update_instrument(new_resource.name, @streams, true)
-    new_resource.updated_by_last_action(true)
+  begin
+    if @librato.update_instrument(new_resource.name, @streams, true)
+      new_resource.updated_by_last_action(true)
+    end
+  rescue => error
+    Chef::Log.warn(error.to_s)
   end
 end
