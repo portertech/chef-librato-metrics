@@ -105,10 +105,16 @@ module Librato
       request.add_field("Content-Type", "application/json")
       request.basic_auth(@email, @token)
       request.body = body.to_json unless body.nil?
-      response = http.request(request)
-      response_code = response.code.to_i
-      response_body = JSON.parse(response.body) rescue nil
-      [response_code, response_body]
+      begin
+        Timeout::timeout(8) do
+          response = http.request(request)
+        end
+        response_code = response.code.to_i
+        response_body = JSON.parse(response.body) rescue nil
+        [response_code, response_body]
+      rescue Timeout::Error
+        raise "Librato Metrics API request timed out (8 seconds)"
+      end
     end
   end
 end
