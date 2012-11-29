@@ -38,3 +38,13 @@ action :update do
     Chef::Log.warn(error.to_s)
   end
 end
+
+action :delete do
+  begin
+    if @librato.delete_metric(new_resource.name)
+      new_resource.updated_by_last_action(true)
+    end
+  rescue => error
+    Chef::Log.warn(error.to_s)
+  end
+end

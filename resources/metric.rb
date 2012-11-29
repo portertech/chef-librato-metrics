@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-actions :update
+actions :update, :delete
 
 attribute :email, :kind_of => String
 attribute :token, :kind_of => String
