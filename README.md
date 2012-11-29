@@ -92,7 +92,7 @@ end
 
 #### Update
 
-Customize an existing metric:
+Customize a metric:
 
 ``` ruby
 librato_metrics_metric "example" do
