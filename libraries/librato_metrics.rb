@@ -84,10 +84,33 @@ module Librato
       end
     end
 
+    def update_metric(name, type, parameters={})
+      metric = parameters.merge("type" => type)
+      code, body = api_request("put", "metrics/#{name}", metric)
+      case code
+      when 201, 204
+        true
+      else
+        raise "Failed to update Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
+    def delete_metric(name)
+      code, body = api_request("delete", "metrics/#{name}")
+      case code
+      when 204
+        true
+      when 404
+        false
+      else
+        raise "Failed to delete Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
     private
 
     def api_request(http_method, resource, body=nil)
-      uri = URI.parse(@api_url + resource)
+      uri = URI.parse(@api_url + URI.escape(resource))
       http = Net::HTTP.new(uri.host, uri.port)
       if uri.scheme == "https"
         http.use_ssl = true
@@ -101,6 +124,8 @@ module Librato
         Net::HTTP::Post.new(request_uri)
       when "put"
         Net::HTTP::Put.new(request_uri)
+      when "delete"
+        Net::HTTP::Delete.new(request_uri)
       end
       request.add_field("Content-Type", "application/json")
       request.basic_auth(@email, @token)
