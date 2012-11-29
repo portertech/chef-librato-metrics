@@ -1,6 +1,6 @@
 ## Description
 
-Provides a LWRP to manage [Librato Metrics](https://metrics.librato.com).
+Provides LWRPs to manage [Librato Metrics](https://metrics.librato.com).
 
 ## Requirements
 
