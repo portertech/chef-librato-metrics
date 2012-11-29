@@ -84,6 +84,16 @@ module Librato
       end
     end
 
+    def update_metric(name, type, parameters={})
+      metric = parameters.merge("type" => type)
+      code, body = api_request("put", "metrics/#{name}", metric)
+      if code == 201 || code == 204
+        true
+      else
+        raise "Failed to update Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
     private
 
     def api_request(http_method, resource, body=nil)
