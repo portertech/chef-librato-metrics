@@ -97,7 +97,7 @@ module Librato
     private
 
     def api_request(http_method, resource, body=nil)
-      uri = URI.parse(@api_url + resource)
+      uri = URI.parse(@api_url + URI.escape(resource))
       http = Net::HTTP.new(uri.host, uri.port)
       if uri.scheme == "https"
         http.use_ssl = true
