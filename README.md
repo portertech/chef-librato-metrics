@@ -1,6 +1,6 @@
 ## Description
 
-Provides a LWRP to manage [Librato Metrics](https://metrics.librato.com) instruments.
+Provides a LWRP to manage [Librato Metrics](https://metrics.librato.com).
 
 ## Requirements
 
@@ -14,7 +14,9 @@ Provides a LWRP to manage [Librato Metrics](https://metrics.librato.com) instrum
 
 ## Usage
 
-### Create
+### Instrument
+
+#### Create
 
 An instrument with a single metric stream:
 
@@ -45,7 +47,7 @@ librato_metrics_instrument "example" do
 end
 ```
 
-### Update
+#### Update
 
 Keep an instrument updated (Chef search results etc.):
 
@@ -73,7 +75,7 @@ It's common to create an instrument and ensure it stays up-to-date:
 action [:create, :update]
 ```
 
-### Add
+#### Add
 
 Add a metric stream to an existing instrument:
 
@@ -83,6 +85,30 @@ librato_metrics_instrument "example" do
   source "*.sub.domain.com"
   group_function "sum"
   action :add
+end
+```
+
+### Metric
+
+#### Update
+
+Customize an existing metric:
+
+``` ruby
+librato_metrics_metric "example" do
+  display_name "example metric"
+  description "example metric for readme"
+  attributes("display_units_long" => "count")
+end
+```
+
+#### Delete
+
+Delete a metric:
+
+``` ruby
+librato_metrics_metric "example" do
+  action :delete
 end
 ```
 
