@@ -107,6 +107,65 @@ module Librato
       end
     end
 
+    def dashboards
+      code, body = api_request("get", "dashboards")
+      if code == 200
+        body["dashboards"]
+      else
+        raise "Failed to get Librato Metrics dashboards -- #{code} -- #{body}"
+      end
+    end
+
+    def dashboard_exists?(name)
+      dashboards.any? do |dashboard|
+        dashboard["name"] == name
+      end
+    end
+
+    def get_dashboard(name)
+      dashboard = dashboards.select {|dashboard| dashboard["name"] == name }.first
+      if dashboard.nil?
+        raise "Librato Metrics dashboard '#{name}' does not exist"
+      end
+      dashboard
+    end
+
+    def create_dashboard(name, instruments=[])
+      dashboard = {
+        "name" => name,
+        "instruments" => instruments
+      }
+      code, body = api_request("post", "dashboards", dashboard)
+      if code == 201
+        true
+      else
+        raise "Failed to create Librato Metrics dashboard '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
+    def update_dashboard(name, instruments=[], addition=false)
+      current_dashboard = get_dashboard(name)
+      updated_instruments = if addition
+        (current_dashboard["instruments"] + instruments).uniq
+      else
+        instruments
+      end
+      if current_dashboard["instruments"] == updated_instruments
+        false
+      else
+        dashboard = {
+          "name" => name,
+          "instruments" => updated_instruments
+        }
+        code, body = api_request("put", "dashboards/#{current_dashboard["id"]}", dashboard)
+        if code == 204
+          true
+        else
+          raise "Failed to update Librato Metrics dashboard '#{name}' -- #{code} -- #{body}"
+        end
+      end
+    end
+
     private
 
     def api_request(http_method, resource, body=nil)
