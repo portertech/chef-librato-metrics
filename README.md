@@ -28,7 +28,7 @@ librato_metrics_instrument "example" do
 end
 ```
 
-An instrument with a many metric streams:
+An instrument with multiple metric streams:
 
 ``` ruby
 librato_metrics_instrument "example" do
@@ -100,7 +100,7 @@ librato_metrics_dashboard "example" do
 end
 ```
 
-A dashboard with a many instruments:
+A dashboard with multiple instruments:
 
 ``` ruby
 librato_metrics_dashboard "example" do
