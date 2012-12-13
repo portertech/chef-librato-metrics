@@ -88,6 +88,63 @@ librato_metrics_instrument "example" do
 end
 ```
 
+### Dashboard
+
+#### Create
+
+A dashboard with a single instrument:
+
+``` ruby
+librato_metrics_dashboard "example" do
+  instrument "example"
+end
+```
+
+A dashboard with a many instruments:
+
+``` ruby
+librato_metrics_dashboard "example" do
+  instruments([
+    "example",
+    "foo",
+    "bar"
+  ])
+end
+```
+
+#### Update
+
+Keep a dashboard updated (Chef search results etc.):
+
+``` ruby
+librato_metrics_dashboard "example" do
+  instruments([
+    "example",
+    "foo",
+    "bar",
+    "baz"
+  ])
+  action :update
+end
+```
+
+It's common to create a dashboard and ensure it stays up-to-date:
+
+``` ruby
+action [:create, :update]
+```
+
+#### Add
+
+Add an instrument to an existing dashboard:
+
+``` ruby
+librato_metrics_dashboard "example" do
+  instrument "qux"
+  action :add
+end
+```
+
 ### Metric
 
 #### Update
