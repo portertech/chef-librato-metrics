@@ -25,6 +25,29 @@ module Librato
       @api_url = api_url
     end
 
+    def update_metric(name, type, parameters={})
+      metric = parameters.merge("type" => type)
+      code, body = api_request("put", "metrics/#{name}", metric)
+      case code
+      when 201, 204
+        true
+      else
+        raise "Failed to update Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
+    def delete_metric(name)
+      code, body = api_request("delete", "metrics/#{name}")
+      case code
+      when 204
+        true
+      when 404
+        false
+      else
+        raise "Failed to delete Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
     def instruments
       code, body = api_request("get", "instruments")
       if code == 200
@@ -81,29 +104,6 @@ module Librato
         else
           raise "Failed to update Librato Metrics instrument '#{name}' -- #{code} -- #{body}"
         end
-      end
-    end
-
-    def update_metric(name, type, parameters={})
-      metric = parameters.merge("type" => type)
-      code, body = api_request("put", "metrics/#{name}", metric)
-      case code
-      when 201, 204
-        true
-      else
-        raise "Failed to update Librato Metrics metric '#{name}' -- #{code} -- #{body}"
-      end
-    end
-
-    def delete_metric(name)
-      code, body = api_request("delete", "metrics/#{name}")
-      case code
-      when 204
-        true
-      when 404
-        false
-      else
-        raise "Failed to delete Librato Metrics metric '#{name}' -- #{code} -- #{body}"
       end
     end
 
