@@ -21,6 +21,7 @@ actions :create, :update, :add
 
 attribute :email, :kind_of => String
 attribute :token, :kind_of => String
+attribute :instrument, :kind_of => String
 attribute :instruments, :kind_of => Array, :default => Array.new
 
 def initialize(*args)

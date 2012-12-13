@@ -21,15 +21,25 @@ def load_current_resource
   email = new_resource.email || node.librato_metrics.email
   token = new_resource.token || node.librato_metrics.token
   @librato = Librato::Metrics.new(email, token)
-  @instruments = new_resource.instruments.map { |instrument_name|
+  @instruments = if new_resource.instrument
     begin
-      instrument = @librato.get_instrument(instrument_name)
-      {"id" => instrument["id"]}
+      instrument = @librato.get_instrument(new_resource.instrument)
+      [{"id" => instrument["id"]}]
     rescue => error
       Chef::Log.warn(error.to_s)
-      nil
+      Array.new
     end
-  }.compact
+  else
+    new_resource.instruments.map { |instrument_name|
+      begin
+        instrument = @librato.get_instrument(instrument_name)
+        {"id" => instrument["id"]}
+      rescue => error
+        Chef::Log.warn(error.to_s)
+        nil
+      end
+    }.compact
+  end
 end
 
 action :create do
