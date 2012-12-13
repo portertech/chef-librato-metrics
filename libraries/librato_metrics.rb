@@ -25,6 +25,29 @@ module Librato
       @api_url = api_url
     end
 
+    def update_metric(name, type, parameters={})
+      metric = parameters.merge("type" => type)
+      code, body = api_request("put", "metrics/#{name}", metric)
+      case code
+      when 201, 204
+        true
+      else
+        raise "Failed to update Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
+    def delete_metric(name)
+      code, body = api_request("delete", "metrics/#{name}")
+      case code
+      when 204
+        true
+      when 404
+        false
+      else
+        raise "Failed to delete Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
     def instruments
       code, body = api_request("get", "instruments")
       if code == 200
@@ -84,26 +107,62 @@ module Librato
       end
     end
 
-    def update_metric(name, type, parameters={})
-      metric = parameters.merge("type" => type)
-      code, body = api_request("put", "metrics/#{name}", metric)
-      case code
-      when 201, 204
-        true
+    def dashboards
+      code, body = api_request("get", "dashboards")
+      if code == 200
+        body["dashboards"]
       else
-        raise "Failed to update Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+        raise "Failed to get Librato Metrics dashboards -- #{code} -- #{body}"
       end
     end
 
-    def delete_metric(name)
-      code, body = api_request("delete", "metrics/#{name}")
-      case code
-      when 204
+    def dashboard_exists?(name)
+      dashboards.any? do |dashboard|
+        dashboard["name"] == name
+      end
+    end
+
+    def get_dashboard(name)
+      dashboard = dashboards.select {|dashboard| dashboard["name"] == name }.first
+      if dashboard.nil?
+        raise "Librato Metrics dashboard '#{name}' does not exist"
+      end
+      dashboard
+    end
+
+    def create_dashboard(name, instruments=[])
+      dashboard = {
+        "name" => name,
+        "instruments" => instruments
+      }
+      code, body = api_request("post", "dashboards", dashboard)
+      if code == 201
         true
-      when 404
+      else
+        raise "Failed to create Librato Metrics dashboard '#{name}' -- #{code} -- #{body}"
+      end
+    end
+
+    def update_dashboard(name, instruments=[], addition=false)
+      current_dashboard = get_dashboard(name)
+      updated_instruments = if addition
+        (current_dashboard["instruments"] + instruments).uniq
+      else
+        instruments
+      end
+      if current_dashboard["instruments"] == updated_instruments
         false
       else
-        raise "Failed to delete Librato Metrics metric '#{name}' -- #{code} -- #{body}"
+        dashboard = {
+          "name" => name,
+          "instruments" => updated_instruments
+        }
+        code, body = api_request("put", "dashboards/#{current_dashboard["id"]}", dashboard)
+        if code == 204
+          true
+        else
+          raise "Failed to update Librato Metrics dashboard '#{name}' -- #{code} -- #{body}"
+        end
       end
     end
 
