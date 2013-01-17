@@ -20,6 +20,7 @@
 def load_current_resource
   email = new_resource.email || node.librato_metrics.email
   token = new_resource.token || node.librato_metrics.token
+  @attributes = new_resource.attributes
   @librato = Librato::Metrics.new(email, token)
   @streams = if new_resource.metric
     [
@@ -37,7 +38,7 @@ end
 action :create do
   begin
     unless @librato.instrument_exists?(new_resource.name)
-      @librato.create_instrument(new_resource.name, @streams)
+      @librato.create_instrument(new_resource.name, @streams, @attributes)
       new_resource.updated_by_last_action(true)
     end
   rescue => error
@@ -47,7 +48,7 @@ end
 
 action :update do
   begin
-    if @librato.update_instrument(new_resource.name, @streams)
+    if @librato.update_instrument(new_resource.name, @streams, @attributes)
       new_resource.updated_by_last_action(true)
     end
   rescue => error
@@ -57,7 +58,7 @@ end
 
 action :add do
   begin
-    if @librato.update_instrument(new_resource.name, @streams, true)
+    if @librato.update_instrument(new_resource.name, @streams, true, @attributes)
       new_resource.updated_by_last_action(true)
     end
   rescue => error

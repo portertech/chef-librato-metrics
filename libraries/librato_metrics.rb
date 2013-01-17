@@ -71,10 +71,11 @@ module Librato
       instrument
     end
 
-    def create_instrument(name, streams=[])
+    def create_instrument(name, streams=[], attributes={})
       instrument = {
         "name" => name,
-        "streams" => streams
+        "streams" => streams,
+        "attributes" => attributes
       }
       code, body = api_request("post", "instruments", instrument)
       if code == 201
@@ -84,7 +85,7 @@ module Librato
       end
     end
 
-    def update_instrument(name, streams=[], addition=false)
+    def update_instrument(name, streams=[], addition=false, attributes={})
       current_instrument = get_instrument(name)
       updated_streams = if addition
         (current_instrument["streams"] + streams).uniq
@@ -96,7 +97,8 @@ module Librato
       else
         instrument = {
           "name" => name,
-          "streams" => updated_streams
+          "streams" => updated_streams,
+          "attributes" => attributes
         }
         code, body = api_request("put", "instruments/#{current_instrument["id"]}", instrument)
         if code == 204

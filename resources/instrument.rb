@@ -25,6 +25,7 @@ attribute :metric, :kind_of => String
 attribute :source, :kind_of => String, :default => "*"
 attribute :group_function, :kind_of => String, :equal_to => %w[average sum breakout], :default => "average"
 attribute :streams, :kind_of => Array, :default => Array.new
+attribute :attributes, :kind_of => Hash
 
 def initialize(*args)
   super
