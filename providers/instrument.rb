@@ -26,7 +26,8 @@ def load_current_resource
       {
         "metric" => new_resource.metric,
         "source" => new_resource.source,
-        "group_function" => new_resource.group_function
+        "group_function" => new_resource.group_function,
+        "color" => new_resource.color
       }
     ]
   else
